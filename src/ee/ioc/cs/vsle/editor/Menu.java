@@ -66,6 +66,7 @@ public class Menu {
     public static final String RUN = "Run";
     public static final String PROPAGATE_VALUES = "Propagate";
     public static final String COMPUTE_GOAL = "Compute Goal";
+    public static final String APPLY_LAYOUT = "Apply layout...";
     public static final String SCHEME_VALUES = "Values...";
     public static final String SCHEMEOPTIONS = "Options...";
 

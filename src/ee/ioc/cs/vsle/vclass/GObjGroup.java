@@ -12,8 +12,8 @@ public class GObjGroup extends GObj implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<GObj> objects;
 
-	public GObjGroup(ArrayList<GObj> objects) {
-		super();
+	public GObjGroup(ArrayList<GObj> objects) {		
+		super();		
 		this.objects = objects;
 		setBounds();
 	}

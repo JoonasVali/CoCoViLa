@@ -22,7 +22,7 @@ public class PackageClass implements Serializable {
             this.hasSpec = hasSpec;
         }
         
-        public GObj getInstance() {
+        public GObj getInstance() {        	 
             try {
                 return _class.newInstance();
             } catch ( Exception e ) {

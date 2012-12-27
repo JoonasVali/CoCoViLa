@@ -12,7 +12,9 @@ import javax.swing.event.*;
 import javax.swing.undo.*;
 
 import ee.ioc.cs.vsle.ccl.*;
+import ee.ioc.cs.vsle.editor.SchemeLoader.PackageHandler;
 import ee.ioc.cs.vsle.event.*;
+import ee.ioc.cs.vsle.layout.LayoutManager;
 import ee.ioc.cs.vsle.packageparse.*;
 import ee.ioc.cs.vsle.util.*;
 import ee.ioc.cs.vsle.vclass.*;
@@ -1124,8 +1126,8 @@ public class Canvas extends JPanel implements ISchemeContainer {
         recalcPreferredSize();
         drawingArea.repaint();
         
-        setStatusBarText( "Loaded scheme: " + loader.getSchemePath() );
-        setLastScheme( loader.getSchemePath() );
+        setStatusBarText( "Loaded scheme: " + loader.getSchemePath() );        
+        setLastScheme( loader.getSchemePath() );                
         return true;
     }
 
@@ -1742,10 +1744,11 @@ public class Canvas extends JPanel implements ISchemeContainer {
      * 
      * @param className the name of the visual class
      */
-    public GObj createAndInitNewObject( String className ) {
+    public GObj createAndInitNewObject( String className ) {    	
         PackageClass pClass = vPackage.getClass( className );
-        GObj obj = pClass.getNewInstance();
+        GObj obj = pClass.getNewInstance();        
         setCurrentObj( obj );
+        System.out.println(obj.getComponents().size());
 
         assert obj != null;
 

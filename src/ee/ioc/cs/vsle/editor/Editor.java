@@ -476,6 +476,12 @@ public class Editor extends JFrame implements ChangeListener {
         menuItem = new JMenuItem( Menu.EXTEND_SPEC, KeyEvent.VK_E );
         menuItem.addActionListener( aListener );
         menu.add( menuItem );
+        
+        //Open layout options	
+        menuItem = new JMenuItem( Menu.APPLY_LAYOUT, KeyEvent.VK_A );        
+        menuItem.addActionListener( aListener );       
+        menu.add( menuItem );
+        
         menu.add( new JSeparator() );
         // Run
         menuItem = new JMenuItem( Menu.RUN, KeyEvent.VK_R );
@@ -490,17 +496,19 @@ public class Editor extends JFrame implements ChangeListener {
         //Compute goal
         menuItem = new JCheckBoxMenuItem( Menu.COMPUTE_GOAL, RuntimeProperties.isComputeGoal() );
         menuItem.addActionListener( aListener );
-        menu.add( menuItem );
+        menu.add( menuItem );       
         
         menu.add( new JSeparator() );
 
         // Values
-        menuItem = new JMenuItem( Menu.SCHEME_VALUES, KeyEvent.VK_V );
+        menuItem = new JMenuItem( Menu.SCHEME_VALUES, KeyEvent.VK_V );        
         menuItem.addActionListener( aListener );
-        boolean enabled = getCurrentCanvas() != null && getCurrentCanvas().getLastProgramRunnerID() != 0;
-        menuItem.setEnabled( enabled );
-        if(!enabled)
-            menuItem.setToolTipText( "Run the scheme first" );
+        {
+	        boolean enabled = getCurrentCanvas() != null && getCurrentCanvas().getLastProgramRunnerID() != 0;
+	        menuItem.setEnabled( enabled );
+	        if(!enabled)
+	            menuItem.setToolTipText( "Run the scheme first" );
+        }
         menu.add( menuItem );
         
         menu.add( new JSeparator() );

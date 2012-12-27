@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.undo.*;
 
 import ee.ioc.cs.vsle.editor.scheme.*;
+import ee.ioc.cs.vsle.layout.dialog.Dialog;
 import ee.ioc.cs.vsle.event.*;
 import ee.ioc.cs.vsle.iconeditor.*;
 import ee.ioc.cs.vsle.table.gui.*;
@@ -302,8 +303,10 @@ public class EditorActionListener implements ActionListener {
                 JCheckBoxMenuItem check = (JCheckBoxMenuItem) e.getSource();
                 RuntimeProperties.setPropagateValues( check.isSelected() );
             } else if ( e.getActionCommand().equals( Menu.COMPUTE_GOAL ) ) {
-                JCheckBoxMenuItem check = (JCheckBoxMenuItem) e.getSource();
+                JCheckBoxMenuItem check = (JCheckBoxMenuItem) e.getSource();            
                 RuntimeProperties.setComputeGoal( check.isSelected() );
+            } else if ( e.getActionCommand().equals( Menu.APPLY_LAYOUT ) ) {           	
+              Dialog.getInstance(Editor.getInstance().getCurrentCanvas()).launch();              
             } else if ( e.getActionCommand().equals( Menu.SCHEME_VALUES ) ) {
                 Canvas canvas = Editor.getInstance().getCurrentCanvas();
                 if ( canvas != null ) {

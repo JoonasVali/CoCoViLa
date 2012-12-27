@@ -74,7 +74,7 @@ public class GObj implements Serializable, Cloneable,
     
     private String extendedSpec;
     
-    public GObj() {
+    public GObj() {    	
         // default constructor
     }
 
@@ -472,9 +472,9 @@ public class GObj implements Serializable, Cloneable,
     }
 
     @Override
-    public void setX( int x ) {
-        // Editor GUI does not support negative coordinates properly
-        this.x = x < 0 ? DEFAULT_X : x;
+    public void setX( int x ) {    	
+      // Editor GUI does not support negative coordinates properly
+      this.x = x < 0 ? DEFAULT_X : x;
     }
 
     @Override
