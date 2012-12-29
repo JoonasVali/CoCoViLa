@@ -24,10 +24,7 @@ public class GraphAdapter extends Graph {
 
 	public void apply(ObjectList objects, ConnectionList connections){				
 		Map<GObj, Node> collection = getNodes(objects, connections);
-		setNodes(collection.values());		
-		for(Node n: collection.values()){			
-			System.out.println(n.getHeight()+" "+n.getWidth());
-		}
+		setNodes(collection.values());				
 	}
 	
 	public Node getNode(GObj obj){
@@ -77,8 +74,8 @@ public class GraphAdapter extends Graph {
 	  return collection;
   }
 	
-	private static Node gObjToNode(GObj obj){
-		Point size = new Point(obj.getWidth(), obj.getHeight());
+	private static Node gObjToNode(GObj obj){		
+		Point size = new Point(obj.getWidth(), obj.getHeight());		
   	Point location = new Point(obj.getX(), obj.getY());
   	Node node = new Node(location, size);	  	
   	return node;

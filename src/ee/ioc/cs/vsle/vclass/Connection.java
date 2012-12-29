@@ -183,7 +183,14 @@ public class Connection implements ee.ioc.cs.vsle.api.Connection, Serializable {
 		if (breakPoints != null && breakPoints.size() > 0)
 			breakPoints.remove(breakPoints.size() - 1);
 	} // removeBreakPoint
-
+	
+	/**
+	 * Removes all breakpoints
+	 */
+	public void removeAllBreakPoints() {
+		breakPoints.clear();
+	} 
+	
 	/**
 	 * Removes a breakpoint that is near the specified point.
 	 * @param pointX X coordinate of the point

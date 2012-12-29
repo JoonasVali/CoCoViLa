@@ -1,8 +1,7 @@
 package ee.ioc.cs.vsle.layout;
 
-import java.awt.Point;
-
 import ee.ioc.cs.vsle.editor.Editor;
+import ee.ioc.cs.vsle.vclass.Connection;
 import ee.ioc.cs.vsle.vclass.ConnectionList;
 import ee.ioc.cs.vsle.vclass.GObj;
 import ee.ioc.cs.vsle.vclass.ObjectList;
@@ -16,10 +15,13 @@ public class LayoutManager {
 	private Layout layout;	
 	private GraphAdapter graph;
 	public LayoutManager(ObjectList objects, ConnectionList connections){		
-		this(new ForceLayout(new Point(700, 700)), objects, connections);	
+		this(new ForceLayout(), objects, connections);	
 	}
 	
 	public LayoutManager(Layout layout, ObjectList objects, ConnectionList connections){
+		for(Connection con: connections){
+			con.removeAllBreakPoints();
+		}
 		this.objects = objects;
 		graph = new GraphAdapter();		
 		graph.apply(objects, connections);
@@ -32,16 +34,17 @@ public class LayoutManager {
 			@Override
 			public void update() {
 				for(GObj obj: objects){
-					Node node = graph.getNode(obj);
+					Node node = graph.getNode(obj);						
 					obj.setX(node.getLocation().x);
-					obj.setY(node.getLocation().y);
+					obj.setY(node.getLocation().y);					
 				}				
 				Editor.getInstance().getCurrentCanvas().repaint();
 			}
 		};
   }
 
-	public void execute(){
+	public void execute(){		
+		
 		layout.execute(graph);		
 	}
 	
