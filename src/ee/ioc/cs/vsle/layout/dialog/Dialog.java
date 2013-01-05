@@ -8,14 +8,12 @@ import ee.ioc.cs.vsle.layout.LayoutManager;
 import ee.ioc.cs.vsle.vclass.Scheme;
 
 public class Dialog {
-	private static IdentityHashMap<Canvas, Dialog> dialogs = new IdentityHashMap<Canvas, Dialog>();
-	private Canvas canvas;
+	private static IdentityHashMap<Canvas, Dialog> dialogs = new IdentityHashMap<Canvas, Dialog>();	
 	private boolean run = false;
 	private LayoutManager manager;
 	
-	public Dialog(Canvas canvas) {
-	  this.canvas = canvas;
-	  Scheme scheme = canvas.getScheme();
+	public Dialog(Canvas canvas) {	  
+	  Scheme scheme = canvas.getScheme();	  
 	  manager = new LayoutManager(scheme.getObjectList(), scheme.getConnectionList());
   }
 
@@ -28,7 +26,9 @@ public class Dialog {
 		return dialog;		
 	}
 	
-	public void launch(){
+	public void launch(Scheme scheme){
+		manager.setObjects(scheme.getObjectList());
+		manager.setConnections(scheme.getConnectionList());		
 		run = !run;		
 		if(run){			
 			manager.execute();

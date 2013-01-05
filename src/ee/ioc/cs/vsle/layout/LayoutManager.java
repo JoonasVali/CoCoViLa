@@ -12,6 +12,7 @@ import ee.joonasvali.graps.layout.forcelayout.UpdateListener;
 
 public class LayoutManager {
 	private ObjectList objects;
+	private ConnectionList connections;
 	private Layout layout;	
 	private GraphAdapter graph;
 	public LayoutManager(ObjectList objects, ConnectionList connections){		
@@ -19,12 +20,9 @@ public class LayoutManager {
 	}
 	
 	public LayoutManager(Layout layout, ObjectList objects, ConnectionList connections){
-		for(Connection con: connections){
-			con.removeAllBreakPoints();
-		}
-		this.objects = objects;
+		this.connections = connections;
+		this.objects = objects;				
 		graph = new GraphAdapter();		
-		graph.apply(objects, connections);
 		this.layout = layout;	
 		this.layout.addListener(makeListener());
 	}
@@ -43,14 +41,26 @@ public class LayoutManager {
 		};
   }
 
-	public void execute(){		
+	public void execute(){				
+		for(Connection con: connections){
+			con.removeAllBreakPoints();
+		}
 		
+		graph.apply(this.objects, this.connections);
 		layout.execute(graph);		
 	}
 	
 	public void stop(){
 		layout.stop();
 	}
+
+	public void setObjects(ObjectList objectList) {
+	  this.objects = objectList;	  
+  }
+
+	public void setConnections(ConnectionList connectionList) {
+	  this.connections = connectionList;	  
+  }
 	
 	
 	

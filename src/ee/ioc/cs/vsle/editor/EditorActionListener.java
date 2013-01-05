@@ -306,7 +306,8 @@ public class EditorActionListener implements ActionListener {
                 JCheckBoxMenuItem check = (JCheckBoxMenuItem) e.getSource();            
                 RuntimeProperties.setComputeGoal( check.isSelected() );
             } else if ( e.getActionCommand().equals( Menu.APPLY_LAYOUT ) ) {           	
-              Dialog.getInstance(Editor.getInstance().getCurrentCanvas()).launch();              
+              Dialog.getInstance(Editor.getInstance().getCurrentCanvas())
+              	.launch(Editor.getInstance().getCurrentCanvas().getScheme());              
             } else if ( e.getActionCommand().equals( Menu.SCHEME_VALUES ) ) {
                 Canvas canvas = Editor.getInstance().getCurrentCanvas();
                 if ( canvas != null ) {
