@@ -41,6 +41,7 @@ public abstract class PaletteBase implements ActionListener {
 
     protected abstract void setState(String state);
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         int i = buttons.lastIndexOf(e.getSource());
         if (i < 0)
@@ -166,5 +167,17 @@ public abstract class PaletteBase implements ActionListener {
         zoomPanel.add(zoom);
 
         return zoomPanel;
+    }
+    
+    protected void destroy() {
+        for ( JToggleButton button : buttons ) {
+            button.removeActionListener(getButtonActionListener());
+            button.removeMouseListener(getButtonMouseListener());
+            // Flush icons, otherwise updated icons will not get displayed.
+            ((ImageIcon) button.getIcon()).getImage().flush();
+        }
+        buttons.clear();
+        buttons = null;
+        mouseListener = null;
     }
 }

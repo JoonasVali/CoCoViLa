@@ -38,7 +38,8 @@ public class Canvas extends JPanel implements ISchemeContainer {
     Connection currentCon;
     public MouseOps mListener;
     public KeyOps keyListener;
-    boolean showGrid = false;
+    boolean showGrid = RuntimeProperties.isShowGrid();
+    boolean showCtrlPane = RuntimeProperties.isShowControls();
     Dimension drawAreaSize = new Dimension( 600, 500 );
     JPanel infoPanel;
     private JLabel posInfo;
@@ -476,7 +477,7 @@ public class Canvas extends JPanel implements ISchemeContainer {
         setWorkDir( workingDir );
         vPackage = _package;
         initialize();
-        palette = new Palette( this );
+        resetPalette();
         m_canvasTitle = vPackage.getName();
         FontChangeEvent.addFontChangeListener( fontListener );
         validate();
@@ -487,7 +488,14 @@ public class Canvas extends JPanel implements ISchemeContainer {
         vPackage = new PackageXmlProcessor(new File(oldPackage.getPath())).parse();
         if(vPackage==null)
             vPackage = oldPackage;
-        palette.reset();
+        
+        resetPalette();
+    }
+    
+    private void resetPalette() {
+        if( palette != null )
+            palette.destroy();
+        palette = new Palette( this );
     }
     
     public String getLastScheme() {
@@ -530,6 +538,17 @@ public class Canvas extends JPanel implements ISchemeContainer {
         return title;
     }
 
+    /**
+     * Returns scheme name or if it is missing, a package name
+     * 
+     * This method should always return a name 
+     * and never return null 
+     */
+    @Override
+    public String getSchemeName() {
+        return getPackage().getSchemeClassName( getSchemeTitle() );
+    }
+    
     void initialize() {
         setScheme(new Scheme(this));
         mListener = new MouseOps( this );
@@ -1159,6 +1178,7 @@ public class Canvas extends JPanel implements ISchemeContainer {
     public void saveScheme( File file ) {
         if(scheme.saveToFile( file )) {
             setStatusBarText( "Scheme saved to: " + file.getName() );
+            setLastScheme( file.getAbsolutePath() );
         }
     }
 
@@ -1232,6 +1252,15 @@ public class Canvas extends JPanel implements ISchemeContainer {
     public void setGridVisible( boolean b ) {
         this.showGrid = b;
         drawingArea.repaint();
+    }
+    
+    public boolean isCtrlPanelVisible() {
+        return this.showCtrlPane;
+    }
+
+    public void setCtrlPanelVisible( boolean b ) {
+        this.showCtrlPane = b;
+        resetPalette();
     }
     
     public void setDrawPorts( boolean b ) {
@@ -1519,20 +1548,52 @@ public class Canvas extends JPanel implements ISchemeContainer {
     public void destroy() {
         
         FontChangeEvent.removeFontChangeListener( fontListener );
+        fontListener = null;
         
         for ( long id : m_runners ) {
             ProgramRunnerEvent event = new ProgramRunnerEvent( this, id, ProgramRunnerEvent.DESTROY );
 
             EventSystem.queueEvent( event );
         }
-        m_runners.clear();
-
-        // Flush icons, otherwise updated icons will not get displayed.
-        for (JToggleButton b : palette.buttons) {
-            ((ImageIcon) b.getIcon()).getImage().flush();
-        }
-
+        
+        palette.destroy();
+        palette = null;
+        
+        drawingArea.removeMouseListener( mListener );
+        drawingArea.removeMouseMotionListener( mListener );
+        drawingArea.removeKeyListener( keyListener );
+        drawingArea.removeAll();
+        drawingArea.setFocusable( false );
         drawingArea = null;
+        areaScrollPane.removeAll();
+        areaScrollPane = null;
+        removeAll();
+        
+        mListener.destroy();
+        mListener = null;
+        
+        this.removeKeyListener( keyListener );
+        keyListener.destroy();
+        keyListener = null;
+        
+        if( scheme != null ) {
+            scheme.destroy();
+            scheme = null;
+        }
+        vPackage = null;
+        classPainters = null;
+        currentPainter = null;
+        currentObj = null;
+        currentCon = null;
+        drawAreaSize = null;
+        infoPanel = null;
+        posInfo = null;
+        backgroundImage = null;
+        
+        executor.shutdownNow();
+        executor = null;
+        undoManager = null;
+        undoSupport = null;
     }
 
     /**
@@ -1855,6 +1916,7 @@ public class Canvas extends JPanel implements ISchemeContainer {
     /**
      * @return the object list
      */
+    @Override
     public ObjectList getObjectList() {
         return scheme.getObjectList();
     }

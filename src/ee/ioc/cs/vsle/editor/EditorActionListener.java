@@ -130,10 +130,9 @@ public class EditorActionListener implements ActionListener {
 
     @Override
     public void actionPerformed( ActionEvent e ) {
-
         // JmenuItem chosen
-        if ( e.getSource().getClass().getName() == "javax.swing.JMenuItem"
-                || e.getSource().getClass().getName() == "javax.swing.JCheckBoxMenuItem" ) {
+//        if ( e.getSource().getClass().getName() == "javax.swing.JMenuItem"
+//                || e.getSource().getClass().getName() == "javax.swing.JCheckBoxMenuItem" ) {
             
             if ( Menu.NEW_SCHEME.equals( e.getActionCommand() ) ) {
                 newScheme();
@@ -245,6 +244,11 @@ public class EditorActionListener implements ActionListener {
                     Editor.getInstance().getCurrentCanvas().setGridVisible(
                             !Editor.getInstance().getCurrentCanvas().isGridVisible() );
                 }
+            } else if ( e.getActionCommand().equals( Menu.CONTROL_PANEL ) ) {
+                if ( Editor.getInstance().getCurrentCanvas() != null ) {
+                    Editor.getInstance().getCurrentCanvas().setCtrlPanelVisible(
+                            !Editor.getInstance().getCurrentCanvas().isCtrlPanelVisible() );
+                }
             } else if ( e.getActionCommand().equals( Menu.SHOW_PORTS ) ) {
                 if ( Editor.getInstance().getCurrentCanvas() != null ) {
                     Editor.getInstance().getCurrentCanvas().setDrawPorts( ((JCheckBoxMenuItem)e.getSource()).isSelected() );
@@ -300,11 +304,9 @@ public class EditorActionListener implements ActionListener {
                     notifyOnNullPackage(null);
                 }
             } else if ( e.getActionCommand().equals( Menu.PROPAGATE_VALUES ) ) {
-                JCheckBoxMenuItem check = (JCheckBoxMenuItem) e.getSource();
-                RuntimeProperties.setPropagateValues( check.isSelected() );
+                RuntimeProperties.setPropagateValues( checkIfSelected( e.getSource(), false ) );
             } else if ( e.getActionCommand().equals( Menu.COMPUTE_GOAL ) ) {
-                JCheckBoxMenuItem check = (JCheckBoxMenuItem) e.getSource();            
-                RuntimeProperties.setComputeGoal( check.isSelected() );
+                RuntimeProperties.setComputeGoal( checkIfSelected( e.getSource(), false ) );
             } else if ( e.getActionCommand().equals( Menu.APPLY_LAYOUT ) ) {           	
               DialogManager.getInstance(Editor.getInstance().getCurrentCanvas())
               	.launch(Editor.getInstance().getCurrentCanvas().getScheme());              
@@ -356,6 +358,7 @@ public class EditorActionListener implements ActionListener {
                 if ( canvas != null ) {
                     RuntimeProperties.setZoomFactor( canvas.getScale() );
                     RuntimeProperties.setShowGrid( canvas.isGridVisible() );
+                    RuntimeProperties.setShowControls( canvas.isCtrlPanelVisible() );
                 }
                 RuntimeProperties.save();
             } else if ( e.getActionCommand().equals( Menu.VIEW_THREADS ) ) {
@@ -377,8 +380,26 @@ public class EditorActionListener implements ActionListener {
                 }
             } else if (e.getActionCommand().equals(Menu.SCHEME_FIND)) {
                 Editor.getInstance().showSchemeSearchDialog();
+            } else if (e.getActionCommand().equals(Palette.CtrlButton.RUNSAME.getActionCmd())) {
+                Canvas canvas = Editor.getInstance().getCurrentCanvas();
+                long id;
+                if ( canvas != null && ( id = canvas.getLastProgramRunnerID() ) > 0 ) {
+                    int op = ProgramRunnerEvent.RUN;
+                    
+                    if( RuntimeProperties.isPropagateValues() )
+                        op |= ProgramRunnerEvent.PROPAGATE;
+                    
+                    EventSystem.queueEvent( new ProgramRunnerEvent( this, id, op ) );
+                }
+            } else if (e.getActionCommand().equals(Palette.CtrlButton.STOP.getActionCmd())) {
+                Canvas canvas = Editor.getInstance().getCurrentCanvas();
+                long id;
+                if ( canvas != null && ( id = canvas.getLastProgramRunnerID() ) > 0 ) {
+
+                    EventSystem.queueEvent( new ProgramRunnerEvent( this, id, ProgramRunnerEvent.DESTROY ) );
+                }
             }
-        }
+//        }
     }
 
     /**
@@ -484,5 +505,16 @@ public class EditorActionListener implements ActionListener {
             return true;
         }
         return false;
+    }
+    
+    private boolean checkIfSelected( Object src, boolean _default ) {
+        
+        if( src instanceof JCheckBoxMenuItem ) {
+            return ((JCheckBoxMenuItem)src).isSelected();
+        } else if( src instanceof JToggleButton ) {
+            return ((JToggleButton)src).isSelected();
+        }
+        
+        return _default;
     }
 }
