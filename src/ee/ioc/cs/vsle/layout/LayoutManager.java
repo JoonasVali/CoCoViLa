@@ -11,6 +11,7 @@ import ee.ioc.cs.vsle.vclass.ObjectList;
 import ee.joonasvali.graps.graph.Node;
 import ee.joonasvali.graps.layout.Layout;
 import ee.joonasvali.graps.layout.forcelayout.ForceLayout;
+import ee.joonasvali.graps.layout.forcelayout.ForceLayoutConfiguration;
 import ee.joonasvali.graps.layout.forcelayout.UpdateListener;
 import ee.joonasvali.graps.simulator.Simulator;
 
@@ -18,12 +19,14 @@ public class LayoutManager {
 	private ObjectList objects;
 	private ConnectionList connections;
 	private Layout layout;
+	private ForceLayoutConfiguration configuration;	
 	private GraphAdapter graph;
 	private Canvas canvas;	
 
 	public LayoutManager(ObjectList objects, ConnectionList connections,
-	    Canvas canvas) {
+	    Canvas canvas) {		
 		this(new ForceLayout(), objects, connections, canvas);
+		this.configuration = ((ForceLayout)layout).getConfiguration();
 	}
 
 	public LayoutManager(Layout layout, ObjectList objects,
@@ -74,6 +77,14 @@ public class LayoutManager {
 
 	public void setObjects(ObjectList objectList) {
 		this.objects = objectList;
+	}
+	
+	public ForceLayoutConfiguration getConfiguration(){
+		return configuration;
+	}
+	
+	public ForceLayout getLayout(){
+		return (ForceLayout)layout;
 	}
 
 	public void setConnections(ConnectionList connectionList) {
