@@ -18,6 +18,7 @@ import ee.joonasvali.graps.util.FlagManager;
 
 public class GraphAdapter extends Graph {
 	Map<GObj, Node> collection;
+	Map<ee.joonasvali.graps.graph.Port, Connection> connectionReferences = new HashMap<ee.joonasvali.graps.graph.Port, Connection>();
 	
 	public GraphAdapter() {
 		super(Collections.<Node> emptyList());		
@@ -47,11 +48,11 @@ public class GraphAdapter extends Graph {
 	}
 	
 	private Map<GObj, Node> makeNodes(ObjectList objects, ConnectionList connections) {	
-		
+		connectionReferences.clear();
 		for(Connection con: connections){
-			ee.joonasvali.graps.graph.Port nodePort = null, nodePort2 = null;
+			ee.joonasvali.graps.graph.Port nodePort = null, nodePort2 = null;			
 			Port begin =con.getBeginPort();
-  		Port end = con.getEndPort();
+  		Port end = con.getEndPort();  		
   		GObj beginObj = begin.getObject();
   		Node beginNode;  		
   		if(!collection.containsKey(beginObj)){
@@ -63,6 +64,7 @@ public class GraphAdapter extends Graph {
   		nodePort = new ee.joonasvali.graps.graph.Port(new Point(begin.getX(), begin.getY())); 		
   		nodePort.setNode(beginNode);
   		beginNode.addPort(nodePort);
+  		connectionReferences.put(nodePort, con);
   		
   		Node endNode;
   		GObj endObj = end.getObject();
@@ -94,6 +96,10 @@ public class GraphAdapter extends Graph {
   	Point location = new Point(obj.getX(), obj.getY());
   	Node node = new Node(location, size);	  	
   	return node;
+	}
+	
+	public Map<ee.joonasvali.graps.graph.Port, Connection> getConnectionReferences(){
+		return connectionReferences;		
 	}
 
 }

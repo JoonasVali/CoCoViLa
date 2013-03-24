@@ -20,11 +20,12 @@ import javax.swing.SwingUtilities;
 
 import ee.ioc.cs.vsle.layout.LayoutManager;
 import ee.ioc.cs.vsle.vclass.Scheme;
+import ee.joonasvali.graps.edges.BreakpointManager;
 import ee.joonasvali.graps.layout.forcelayout.ForceLayoutConfiguration;
 
 public class LayoutDialog {
 	JFrame mainFrame = null;
-	JButton layoutButton, applyButton;
+	JButton layoutButton, applyButton, addBreakpointsButton;
 	
 	JTextField pullForceField;
 	JTextField pushForceField;
@@ -33,6 +34,7 @@ public class LayoutDialog {
 	private boolean run = false;
 	private LayoutManager manager;
 	private Scheme scheme;
+	private BreakpointManager bpManager;
 	
 	private static final Color ERROR_COLOR = new Color(255, 220, 220);
 	private static final double VERY_SMALL = 0.00000000000001d;
@@ -55,13 +57,24 @@ public class LayoutDialog {
 			if (run) {
 				layoutButton.setText(PAUSE);
 				applyAction.actionPerformed(null);
-				manager.execute();
+				manager.execute();				
 			}
 			else {
 				layoutButton.setText(RUN);
 				manager.stop();
 			}
+			addBreakpointsButton.setEnabled(!run);
 		}
+	};
+	
+	ActionListener addBreakpointsAction = new ActionListener(){
+		@Override
+    public void actionPerformed(ActionEvent e) {
+			bpManager.clearBreakpoints();
+			bpManager.makeBreakPoints();
+			manager.applyBreakpoints();
+			scheme.repaint();
+    }		
 	};
 	
 	ActionListener applyAction = new ActionListener() {		
@@ -105,8 +118,9 @@ public class LayoutDialog {
     catch (InterruptedException e) {  }	
 	}
 	
-	public LayoutDialog(Scheme scheme, final LayoutManager manager) {
-		this.manager = manager;
+	public LayoutDialog(Scheme scheme, final LayoutManager manager) {		
+		this.manager = manager;		
+		this.bpManager = new BreakpointManager(manager.getGraph());
 		this.configuration = manager.getConfiguration();
 		this.scheme = scheme;
 		initFrame(manager);				
@@ -114,6 +128,7 @@ public class LayoutDialog {
 		
 		layoutButton.addActionListener(toggleRunAction);
 		applyButton.addActionListener(applyAction);
+		addBreakpointsButton.addActionListener(addBreakpointsAction);
 		
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.getContentPane().add(mainPanel);
@@ -132,7 +147,8 @@ public class LayoutDialog {
 		configurationPanel.add(speedField);
 		
 		bottomPanel.add(layoutButton);
-		bottomPanel.add(applyButton);		
+		bottomPanel.add(applyButton);
+		bottomPanel.add(addBreakpointsButton);	
 		mainFrame.setVisible(true);
 	}
 
@@ -153,6 +169,7 @@ public class LayoutDialog {
 	private void initComponents() {
 	  layoutButton = new JButton(RUN);
 	  applyButton = new JButton("Apply");
+	  addBreakpointsButton = new JButton("Add breakpoints");
 	  pullForceField = new JTextField(Double.toString(configuration.getStringStrength()));
 	  pushForceField = new JTextField(Double.toString(configuration.getCoulombRepulseStrength()));
 	  speedField = new JTextField(Integer.toString(configuration.getSleepTimeBetweenIterations()));
