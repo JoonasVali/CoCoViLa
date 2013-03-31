@@ -1,6 +1,7 @@
 package ee.ioc.cs.vsle.layout;
 
 import java.awt.Color;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,15 +90,20 @@ public class LayoutManager {
 			for(Port p : n.getPorts()){
 				if(done.add(p)){
 					if(p.getPort() != null){
+						boolean reverse = true;
 						done.add(p.getPort());
 						Connection con = connectionReference.get(p);
 						if(con == null){
-							con = connectionReference.get(p.getPort());
+							con = connectionReference.get(p.getPort());						
+							reverse = false;
 						}
 						if(con != null){
 							List<java.awt.Point> breakpoints = p.getBreakpoints();							
 							if(breakpoints.isEmpty()){
 								breakpoints = p.getPort().getBreakpoints();								
+							}
+							if(reverse){
+								Collections.reverse(breakpoints);								
 							}
 							for(java.awt.Point point : breakpoints){
 								Point adapter = new Point(point.x, point.y);								
