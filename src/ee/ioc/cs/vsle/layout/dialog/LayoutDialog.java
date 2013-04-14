@@ -21,7 +21,7 @@ import javax.swing.SwingUtilities;
 import ee.ioc.cs.vsle.layout.LayoutManager;
 import ee.ioc.cs.vsle.vclass.Scheme;
 import ee.joonasvali.graps.edges.BreakpointManager;
-import ee.joonasvali.graps.edges.TurtlePathCalculator;
+import ee.joonasvali.graps.edges.CornerPathCalculator;
 import ee.joonasvali.graps.layout.forcelayout.ForceLayoutConfiguration;
 
 public class LayoutDialog {
@@ -121,7 +121,7 @@ public class LayoutDialog {
 	
 	public LayoutDialog(Scheme scheme, final LayoutManager manager) {		
 		this.manager = manager;		
-		this.bpManager = new BreakpointManager(manager.getGraph(), TurtlePathCalculator.getFactory());
+		this.bpManager = new BreakpointManager(manager.getGraph(), CornerPathCalculator.getFactory());
 		this.configuration = manager.getConfiguration();
 		this.scheme = scheme;
 		initFrame(manager);				
