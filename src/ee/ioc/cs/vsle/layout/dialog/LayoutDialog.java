@@ -31,10 +31,10 @@ public class LayoutDialog {
 	JFrame mainFrame = null;
 	JButton layoutButton, applyButton, addBreakpointsButton;
 	
-	JTextField pullForceField;
-	JTextField pushForceField;
-	JTextField speedField;
-	JTextField dampingField;
+	DoubleJSlider pullForceField;
+	DoubleJSlider pushForceField;
+	DoubleJSlider speedField;
+	DoubleJSlider dampingField;
 	JCheckBox redraw;
 	
 	private boolean run = false;
@@ -111,34 +111,11 @@ public class LayoutDialog {
 		public void actionPerformed(ActionEvent e) {
 			manager.getLayout().addBeforeNextIteration(new Runnable(){
 				@Override
-        public void run() {
-					try{
-						configuration.setCoulombRepulseStrength(Math.max(VERY_SMALL, Double.parseDouble(pushForceField.getText())));						
-						setBackground(pushForceField, Color.WHITE);		
-					} catch(Exception ignore){ 
-						setBackground(pushForceField, ERROR_COLOR);							
-					}
-					
-					try{
-						configuration.setStringStrength(Math.max(VERY_SMALL, Double.parseDouble(pullForceField.getText())));
-						setBackground(pullForceField, Color.WHITE);		
-					} catch(Exception ignore){ 
-						setBackground(pullForceField, ERROR_COLOR);
-					}
-					
-					try{
-						configuration.setSleepTimeBetweenIterations(Math.max(1, Integer.parseInt(speedField.getText())));
-						setBackground(speedField, Color.WHITE);		
-					} catch(Exception ignore){ 
-						setBackground(speedField, ERROR_COLOR);
-					}
-					
-					try{
-						configuration.setDamping(Math.min(1, Math.max(VERY_SMALL, Double.parseDouble(dampingField.getText()))));
-						setBackground(dampingField, Color.WHITE);		
-					} catch(Exception ignore){ 
-						setBackground(dampingField, ERROR_COLOR);
-					}
+        public void run() {					
+					configuration.setStringStrength(pullForceField.getDoubleValue());					
+					configuration.setCoulombRepulseStrength(pushForceField.getDoubleValue());
+					configuration.setSleepTimeBetweenIterations((int)speedField.getDoubleValue());
+					configuration.setDamping(dampingField.getDoubleValue());					
 					
 					manager.setDrawGraph(redraw.isSelected());
 					if(!redraw.isSelected()){
@@ -183,13 +160,13 @@ public class LayoutDialog {
 		topPanel.add(new JLabel("Force Layout"));
 		
 		configurationPanel.add(new JLabel("Hooke's pull constant:"));
-		configurationPanel.add(pullForceField);
+		configurationPanel.add(pullForceField.getComposition());
 		configurationPanel.add(new JLabel("Coulomb push force constant:"));
-		configurationPanel.add(pushForceField);
+		configurationPanel.add(pushForceField.getComposition());
 		configurationPanel.add(new JLabel("Animation sleep time (speed):"));
-		configurationPanel.add(speedField);
+		configurationPanel.add(speedField.getComposition());
 		configurationPanel.add(new JLabel("Cooldown rate:"));
-		configurationPanel.add(dampingField);
+		configurationPanel.add(dampingField.getComposition());
 		configurationPanel.add(progressBar);
 		configurationPanel.add(redraw);
 		
@@ -210,7 +187,7 @@ public class LayoutDialog {
 				}
 			}
 		});
-		mainFrame.setSize(new Dimension(400, 200));
+		mainFrame.setSize(new Dimension(500, 300));
 		mainFrame.setAlwaysOnTop(true);
   }
 
@@ -221,9 +198,9 @@ public class LayoutDialog {
 	  layoutButton = new JButton(RUN);
 	  applyButton = new JButton("Apply");
 	  addBreakpointsButton = new JButton("Add breakpoints");
-	  pullForceField = new JTextField(Double.toString(configuration.getStringStrength()));
-	  pushForceField = new JTextField(Double.toString(configuration.getCoulombRepulseStrength()));
-	  dampingField = new JTextField(Double.toString(configuration.getDamping()));
-	  speedField = new JTextField(Integer.toString(configuration.getSleepTimeBetweenIterations()));
+	  pullForceField = new DoubleJSlider(0.005, 0.1, configuration.getStringStrength(), 0.005);
+	  pushForceField = new DoubleJSlider(5, 300, configuration.getCoulombRepulseStrength(), 5);
+	  dampingField = new DoubleJSlider(0.05, 0.95, configuration.getDamping(), 0.05);
+	  speedField = new DoubleJSlider(0, 1000, configuration.getSleepTimeBetweenIterations(), 10);
   }
 }
