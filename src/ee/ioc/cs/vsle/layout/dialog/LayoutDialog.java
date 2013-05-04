@@ -34,6 +34,7 @@ public class LayoutDialog {
 	JTextField pullForceField;
 	JTextField pushForceField;
 	JTextField speedField;
+	JTextField dampingField;
 	JCheckBox redraw;
 	
 	private boolean run = false;
@@ -132,6 +133,13 @@ public class LayoutDialog {
 						setBackground(speedField, ERROR_COLOR);
 					}
 					
+					try{
+						configuration.setDamping(Math.min(1, Math.max(VERY_SMALL, Double.parseDouble(dampingField.getText()))));
+						setBackground(dampingField, Color.WHITE);		
+					} catch(Exception ignore){ 
+						setBackground(dampingField, ERROR_COLOR);
+					}
+					
 					manager.setDrawGraph(redraw.isSelected());
 					if(!redraw.isSelected()){
 						configuration.setSleepTimeBetweenIterations(0);
@@ -180,6 +188,8 @@ public class LayoutDialog {
 		configurationPanel.add(pushForceField);
 		configurationPanel.add(new JLabel("Animation sleep time (speed):"));
 		configurationPanel.add(speedField);
+		configurationPanel.add(new JLabel("Cooldown rate:"));
+		configurationPanel.add(dampingField);
 		configurationPanel.add(progressBar);
 		configurationPanel.add(redraw);
 		
@@ -213,6 +223,7 @@ public class LayoutDialog {
 	  addBreakpointsButton = new JButton("Add breakpoints");
 	  pullForceField = new JTextField(Double.toString(configuration.getStringStrength()));
 	  pushForceField = new JTextField(Double.toString(configuration.getCoulombRepulseStrength()));
+	  dampingField = new JTextField(Double.toString(configuration.getDamping()));
 	  speedField = new JTextField(Integer.toString(configuration.getSleepTimeBetweenIterations()));
   }
 }
