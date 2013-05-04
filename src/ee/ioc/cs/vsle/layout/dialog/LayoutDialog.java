@@ -12,9 +12,11 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -23,6 +25,7 @@ import ee.ioc.cs.vsle.vclass.Scheme;
 import ee.joonasvali.graps.edges.BreakpointManager;
 import ee.joonasvali.graps.edges.CornerPathCalculator;
 import ee.joonasvali.graps.layout.forcelayout.ForceLayoutConfiguration;
+import ee.joonasvali.graps.layout.forcelayout.UpdateListener;
 
 public class LayoutDialog {
 	JFrame mainFrame = null;
@@ -31,11 +34,13 @@ public class LayoutDialog {
 	JTextField pullForceField;
 	JTextField pushForceField;
 	JTextField speedField;
+	JCheckBox redraw;
 	
 	private boolean run = false;
 	private LayoutManager manager;
 	private Scheme scheme;
 	private BreakpointManager bpManager;
+	private JProgressBar progressBar = new JProgressBar();
 	
 	private static final Color ERROR_COLOR = new Color(255, 220, 220);
 	private static final double VERY_SMALL = 0.00000000000001d;
@@ -47,7 +52,27 @@ public class LayoutDialog {
 	private JPanel mainPanel = new JPanel(new BorderLayout());
 	private JPanel topPanel = new JPanel(new FlowLayout()); 
 	private JPanel configurationPanel = new JPanel(new GridLayout(0, 2)); 
-	private JPanel bottomPanel = new JPanel(new FlowLayout()); 
+	private JPanel bottomPanel = new JPanel(new FlowLayout());	
+	
+	private volatile long biggestVal = Long.MIN_VALUE;
+	
+	UpdateListener volatilityListener = new UpdateListener() {		
+		@Override
+		public void update(final double volatility) {
+			biggestVal = (long) Math.max(biggestVal, volatility);
+			try {
+	      SwingUtilities.invokeAndWait(new Runnable(){
+					@Override
+          public void run() {
+						int percent = (int)(100.0 * ((double)(biggestVal-volatility) / (double)biggestVal));						
+						progressBar.setValue(percent);
+						progressBar.setString(((long)volatility)+" / "+biggestVal + " ( "+percent+"% )");
+          }	      	
+	      });
+      }
+      catch (Exception e) { }      
+		}
+	};
 	
 	ActionListener toggleRunAction = new ActionListener() {
 		@Override
@@ -104,6 +129,8 @@ public class LayoutDialog {
 					} catch(Exception ignore){ 
 						setBackground(speedField, ERROR_COLOR);
 					}
+					
+					manager.setDrawGraph(redraw.isSelected());
         }				
 			});
 		}
@@ -120,6 +147,7 @@ public class LayoutDialog {
 	}
 	
 	public LayoutDialog(Scheme scheme, final LayoutManager manager) {		
+		System.out.println("TOTAL OBJECTS: "+scheme.getObjectList().size());
 		this.manager = manager;		
 		this.bpManager = new BreakpointManager(manager.getGraph(), CornerPathCalculator.getFactory());
 		this.configuration = manager.getConfiguration();
@@ -127,6 +155,7 @@ public class LayoutDialog {
 		initFrame(manager);				
 		initComponents();		
 		
+		manager.addVolatilityListener(volatilityListener);
 		layoutButton.addActionListener(toggleRunAction);
 		applyButton.addActionListener(applyAction);
 		addBreakpointsButton.addActionListener(addBreakpointsAction);
@@ -146,6 +175,9 @@ public class LayoutDialog {
 		configurationPanel.add(pushForceField);
 		configurationPanel.add(new JLabel("Animation sleep time (speed):"));
 		configurationPanel.add(speedField);
+		configurationPanel.add(progressBar);
+		configurationPanel.add(redraw);
+		
 		
 		bottomPanel.add(layoutButton);
 		bottomPanel.add(applyButton);
@@ -167,7 +199,10 @@ public class LayoutDialog {
 		mainFrame.setAlwaysOnTop(true);
   }
 
-	private void initComponents() {
+	private void initComponents() {		
+		progressBar.setStringPainted(true);
+		redraw = new JCheckBox("Draw graph (lower performance)");
+		redraw.setSelected(manager.isDrawGraph());
 	  layoutButton = new JButton(RUN);
 	  applyButton = new JButton("Apply");
 	  addBreakpointsButton = new JButton("Add breakpoints");
