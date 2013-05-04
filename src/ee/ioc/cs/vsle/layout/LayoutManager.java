@@ -90,14 +90,14 @@ public class LayoutManager {
 			con.removeAllBreakPoints();
 		}
 
-		graph.apply(this.objects, this.connections);
+		bind();
 		layout.execute(graph);		
 		
 		/* FOR DEBUGGING */
 //		new Simulator(graph, false);
 	}
 	
-	public void applyBreakpoints(){
+	public void applyBreakpoints(){		
 		for (Connection con : connections) {
 			con.removeAllBreakPoints();
 		}
@@ -137,6 +137,16 @@ public class LayoutManager {
 		update(0);
 	}
 
+	public void bind(){
+		graph.apply(this.objects, this.connections);
+	}
+	
+	public void bind(ObjectList objects, ConnectionList connections){
+		this.objects = objects;
+		this.connections = connections;
+		bind();
+	}
+	
 	public void setObjects(ObjectList objectList) {
 		this.objects = objectList;
 	}
@@ -153,7 +163,7 @@ public class LayoutManager {
 		return (ForceLayout)layout;
 	}
 
-	public void setConnections(ConnectionList connectionList) {
+	public void setConnections(ConnectionList connectionList) {		
 		this.connections = connectionList;
 	}
 

@@ -53,7 +53,7 @@ public class LayoutDialog {
 	private JPanel topPanel = new JPanel(new FlowLayout()); 
 	private JPanel configurationPanel = new JPanel(new GridLayout(0, 2)); 
 	private JPanel bottomPanel = new JPanel(new FlowLayout());	
-	
+		
 	private volatile long biggestVal = Long.MIN_VALUE;
 	
 	UpdateListener volatilityListener = new UpdateListener() {		
@@ -66,7 +66,7 @@ public class LayoutDialog {
           public void run() {
 						int percent = (int)(100.0 * ((double)(biggestVal-volatility) / (double)biggestVal));						
 						progressBar.setValue(percent);
-						progressBar.setString(((long)volatility)+" / "+biggestVal + " ( "+percent+"% )");
+						progressBar.setString(((long)volatility)+" / "+biggestVal + " ( "+Math.max(0, percent)+"% )");
           }	      	
 	      });
       }
@@ -96,6 +96,8 @@ public class LayoutDialog {
 	ActionListener addBreakpointsAction = new ActionListener(){
 		@Override
     public void actionPerformed(ActionEvent e) {
+		  manager.bind(scheme.getObjectList(), scheme.getConnectionList());		  
+			manager.update(0);			
 			bpManager.clearBreakpoints();
 			bpManager.makeBreakPoints();
 			manager.applyBreakpoints();
@@ -131,6 +133,9 @@ public class LayoutDialog {
 					}
 					
 					manager.setDrawGraph(redraw.isSelected());
+					if(!redraw.isSelected()){
+						configuration.setSleepTimeBetweenIterations(0);
+					}
         }				
 			});
 		}
@@ -148,8 +153,8 @@ public class LayoutDialog {
 	
 	public LayoutDialog(Scheme scheme, final LayoutManager manager) {		
 		System.out.println("TOTAL OBJECTS: "+scheme.getObjectList().size());
-		this.manager = manager;		
 		this.bpManager = new BreakpointManager(manager.getGraph(), CornerPathCalculator.getFactory());
+		this.manager = manager;				
 		this.configuration = manager.getConfiguration();
 		this.scheme = scheme;
 		initFrame(manager);				
