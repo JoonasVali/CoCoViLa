@@ -36,6 +36,7 @@ public class LayoutDialog {
 	DoubleJSlider speedField;
 	DoubleJSlider dampingField;
 	JCheckBox redraw;
+	JCheckBox randomize;
 	
 	private boolean run = false;
 	private LayoutManager manager;
@@ -57,6 +58,9 @@ public class LayoutDialog {
 		
 	private volatile long biggestVal = Long.MIN_VALUE;
 	
+	private long t50, t75, t90, t95, t97;
+	private long time;
+	
 	UpdateListener volatilityListener = new UpdateListener() {		
 		@Override
 		public void update(final double volatility) {
@@ -65,7 +69,29 @@ public class LayoutDialog {
 	      SwingUtilities.invokeAndWait(new Runnable(){
 					@Override
           public void run() {
-						int percent = (int)(100.0 * ((double)(biggestVal-volatility) / (double)biggestVal));						
+						int percent = (int)(100.0 * ((double)(biggestVal-volatility) / (double)biggestVal));		
+						
+						if(t50 == 0 && percent >= 50){
+							t50 = System.currentTimeMillis() - time;
+							System.out.println("50% = "+t50);
+						}
+						if(t75 == 0 && percent >= 75){
+							t75 = System.currentTimeMillis() - time;
+							System.out.println("75% = "+t75);
+						}
+						if(t90 == 0 && percent >= 90){
+							t90 = System.currentTimeMillis() - time;
+							System.out.println("90% = "+t90);
+						}
+						if(t95 == 0 && percent >= 95){
+							t95 = System.currentTimeMillis() - time;
+							System.out.println("95% = "+t95);
+						}
+						if(t97 == 0 && percent >= 97){
+							t97 = System.currentTimeMillis() - time;
+							System.out.println("97% = "+t97);
+						}
+						
 						progressBar.setValue(percent);
 						progressBar.setString(((long)volatility)+" / "+biggestVal + " ( "+Math.max(0, percent)+"% )");
           }	      	
@@ -82,6 +108,8 @@ public class LayoutDialog {
 			manager.setConnections(scheme.getConnectionList());
 			run = !run;
 			if (run) {
+				t50 = t75 = t90 = t95 = t97 = 0;
+				time = System.currentTimeMillis();
 				layoutButton.setText(PAUSE);
 				applyAction.actionPerformed(null);
 				manager.execute();				
@@ -115,8 +143,8 @@ public class LayoutDialog {
 					configuration.setStringStrength(pullForceField.getDoubleValue());					
 					configuration.setCoulombRepulseStrength(pushForceField.getDoubleValue());
 					configuration.setSleepTimeBetweenIterations((int)speedField.getDoubleValue());
-					configuration.setDamping(dampingField.getDoubleValue());					
-					
+					configuration.setDamping(dampingField.getDoubleValue());
+					configuration.setRandomizeGraph(randomize.isSelected());					
 					manager.setDrawGraph(redraw.isSelected());
 					if(!redraw.isSelected()){
 						configuration.setSleepTimeBetweenIterations(0);
@@ -169,6 +197,8 @@ public class LayoutDialog {
 		configurationPanel.add(dampingField.getComposition());
 		configurationPanel.add(progressBar);
 		configurationPanel.add(redraw);
+		configurationPanel.add(new JLabel(""));
+		configurationPanel.add(randomize);
 		
 		
 		bottomPanel.add(layoutButton);
@@ -195,6 +225,8 @@ public class LayoutDialog {
 		progressBar.setStringPainted(true);
 		redraw = new JCheckBox("Draw graph (lower performance)");
 		redraw.setSelected(manager.isDrawGraph());
+		randomize = new JCheckBox("Randomize graph on run");
+		randomize.setSelected(manager.getConfiguration().isRandomizeGraph());
 	  layoutButton = new JButton(RUN);
 	  applyButton = new JButton("Apply");
 	  addBreakpointsButton = new JButton("Add breakpoints");
