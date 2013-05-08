@@ -35,6 +35,7 @@ public class LayoutDialog {
 	DoubleJSlider pushForceField;
 	DoubleJSlider speedField;
 	DoubleJSlider dampingField;
+	DoubleJSlider centralPullField;
 	JCheckBox redraw;
 	JCheckBox randomize;
 	
@@ -43,9 +44,6 @@ public class LayoutDialog {
 	private Scheme scheme;
 	private BreakpointManager bpManager;
 	private JProgressBar progressBar = new JProgressBar();
-	
-	private static final Color ERROR_COLOR = new Color(255, 220, 220);
-	private static final double VERY_SMALL = 0.00000000000001d;
 	
 	private static final String RUN = "Run";
 	private static final String PAUSE = "Pause";
@@ -144,7 +142,8 @@ public class LayoutDialog {
 					configuration.setCoulombRepulseStrength(pushForceField.getDoubleValue());
 					configuration.setSleepTimeBetweenIterations((int)speedField.getDoubleValue());
 					configuration.setDamping(dampingField.getDoubleValue());
-					configuration.setRandomizeGraph(randomize.isSelected());					
+					configuration.setRandomizeGraph(randomize.isSelected());				
+					configuration.setCenterForcePullStrength(centralPullField.getDoubleValue());
 					manager.setDrawGraph(redraw.isSelected());
 					if(!redraw.isSelected()){
 						configuration.setSleepTimeBetweenIterations(0);
@@ -153,16 +152,6 @@ public class LayoutDialog {
 			});
 		}
 	};
-
-	private void setBackground(final JTextField field, final Color color){
-		try {
-      SwingUtilities.invokeAndWait(new Runnable(){
-      	public void run() { field.setBackground(color); };           	
-      });
-    }
-    catch (InvocationTargetException e) {  }
-    catch (InterruptedException e) {  }	
-	}
 	
 	public LayoutDialog(Scheme scheme, final LayoutManager manager) {		
 		System.out.println("TOTAL OBJECTS: "+scheme.getObjectList().size());
@@ -191,10 +180,12 @@ public class LayoutDialog {
 		configurationPanel.add(pullForceField.getComposition());
 		configurationPanel.add(new JLabel("Coulomb push force constant:"));
 		configurationPanel.add(pushForceField.getComposition());
+		configurationPanel.add(new JLabel("Central pull:"));
+		configurationPanel.add(centralPullField.getComposition());
 		configurationPanel.add(new JLabel("Animation sleep time (speed):"));
 		configurationPanel.add(speedField.getComposition());
 		configurationPanel.add(new JLabel("Cooldown rate:"));
-		configurationPanel.add(dampingField.getComposition());
+		configurationPanel.add(dampingField.getComposition());		
 		configurationPanel.add(progressBar);
 		configurationPanel.add(redraw);
 		configurationPanel.add(new JLabel(""));
@@ -230,9 +221,11 @@ public class LayoutDialog {
 	  layoutButton = new JButton(RUN);
 	  applyButton = new JButton("Apply");
 	  addBreakpointsButton = new JButton("Add breakpoints");
-	  pullForceField = new DoubleJSlider(0.005, 0.1, configuration.getStringStrength(), 0.005);
-	  pushForceField = new DoubleJSlider(5, 300, configuration.getCoulombRepulseStrength(), 5);
-	  dampingField = new DoubleJSlider(0.05, 0.95, configuration.getDamping(), 0.05);
-	  speedField = new DoubleJSlider(0, 1000, configuration.getSleepTimeBetweenIterations(), 10);
+	  pullForceField = new DoubleJSlider(		0.005, 	0.1, 	configuration.getStringStrength(), 							0.005);
+	  pushForceField = new DoubleJSlider(		5, 			300, 	configuration.getCoulombRepulseStrength(), 			5);
+	  dampingField = new DoubleJSlider(			0.05, 	0.95, configuration.getDamping(), 										0.05);
+	  speedField = new DoubleJSlider(				0, 			1000, configuration.getSleepTimeBetweenIterations(), 	10);
+	  centralPullField = new DoubleJSlider(	0.00, 	0.05, 	configuration.getCenterForcePullStrength(), 		0.001);
+	  
   }
 }
