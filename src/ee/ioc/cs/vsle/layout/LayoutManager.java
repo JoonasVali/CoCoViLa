@@ -18,6 +18,7 @@ import ee.joonasvali.graps.graph.Graph;
 import ee.joonasvali.graps.graph.Node;
 import ee.joonasvali.graps.graph.Port;
 import ee.joonasvali.graps.layout.Layout;
+import ee.joonasvali.graps.layout.LayoutConfiguration;
 import ee.joonasvali.graps.layout.forcelayout.ForceLayout;
 import ee.joonasvali.graps.layout.forcelayout.ForceLayoutConfiguration;
 import ee.joonasvali.graps.layout.forcelayout.UpdateListener;
@@ -27,19 +28,13 @@ public class LayoutManager {
 	private ObjectList objects;
 	private ConnectionList connections;
 	private Layout layout;
-	private ForceLayoutConfiguration configuration;	
+	private LayoutConfiguration configuration;	
 	private GraphAdapter graph;
 	private Canvas canvas;
 	private Map<Port, Connection> connectionReference;
 	private LinkedList<UpdateListener> volatilityListener = new LinkedList<UpdateListener>();
 	
 	private volatile boolean drawGraph = true;
-
-	public LayoutManager(ObjectList objects, ConnectionList connections,
-	    Canvas canvas) {		
-		this(new ForceLayout(), objects, connections, canvas);
-		this.configuration = ((ForceLayout)layout).getConfiguration();
-	}
 
 	public LayoutManager(Layout layout, ObjectList objects,
 	    ConnectionList connections, Canvas canvas) {
@@ -48,7 +43,7 @@ public class LayoutManager {
 		this.objects = objects;
 		graph = new GraphAdapter();
 		connectionReference = graph.getConnectionReferences();
-		
+		this.configuration = layout.getConfiguration();
 		this.layout = layout;
 		this.layout.addListener(makeListener());
 	}
@@ -151,7 +146,7 @@ public class LayoutManager {
 		this.objects = objectList;
 	}
 	
-	public ForceLayoutConfiguration getConfiguration(){
+	public LayoutConfiguration getConfiguration(){
 		return configuration;
 	}
 	

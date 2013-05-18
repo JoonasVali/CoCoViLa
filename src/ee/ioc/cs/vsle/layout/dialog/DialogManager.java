@@ -6,6 +6,7 @@ import java.util.IdentityHashMap;
 import ee.ioc.cs.vsle.editor.Canvas;
 import ee.ioc.cs.vsle.layout.LayoutManager;
 import ee.ioc.cs.vsle.vclass.Scheme;
+import ee.joonasvali.graps.layout.forcelayout.ForceLayout;
 
 public class DialogManager {
 	private static IdentityHashMap<Canvas, DialogManager> dialogs = new IdentityHashMap<Canvas, DialogManager>();	
@@ -13,7 +14,7 @@ public class DialogManager {
 	
 	public DialogManager(Canvas canvas) {	  
 	  Scheme scheme = canvas.getScheme();	  
-	  manager = new LayoutManager(scheme.getObjectList(), scheme.getConnectionList(), canvas);
+	  manager = new LayoutManager(new ForceLayout(), scheme.getObjectList(), scheme.getConnectionList(), canvas);
   }
 
 	public static DialogManager getInstance(Canvas canvas){
